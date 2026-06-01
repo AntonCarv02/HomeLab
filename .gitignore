@@ -1,0 +1,27 @@
+# Terraform - sensitive files
+*.tfvars
+*.tfstate
+*.tfstate.backup
+**/.terraform/
+.terraform.lock.hcl
+
+# Ansible - sensitive files
+*.retry
+group_vars/all/vault.yml
+host_vars/*/vault.yml
+
+# SSH keys - never commit
+*.pem
+*.key
+id_rsa
+id_ed25519
+homelab_key
+homelab_key.pub
+
+# Environment files
+.env
+.env*
+
+# OS
+.DS_Store
+Thumbs.db
