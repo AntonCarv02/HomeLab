@@ -1,0 +1,80 @@
+---
+- name: Update and upgrade apt packages
+  apt:
+    update_cache: yes
+    upgrade: dist
+    cache_valid_time: 3600
+ 
+- name: Install required base packages
+  apt:
+    name:
+      - curl
+      - ca-certificates
+      - gnupg
+      - ufw
+      - fail2ban
+    state: present
+ 
+- name: Set UFW default inbound policy to deny
+  ufw:
+    direction: incoming
+    policy: deny
+ 
+- name: Set UFW default outbound policy to allow
+  ufw:
+    direction: outgoing
+    policy: allow
+ 
+- name: Allow SSH
+  ufw:
+    rule: allow
+    port: "22"
+    proto: tcp
+ 
+- name: Allow HTTP
+  ufw:
+    rule: allow
+    port: "80"
+    proto: tcp
+ 
+- name: Allow HTTPS
+  ufw:
+    rule: allow
+    port: "443"
+    proto: tcp
+ 
+- name: Allow Kubernetes API
+  ufw:
+    rule: allow
+    port: "6443"
+    proto: tcp
+ 
+- name: Allow WireGuard
+  ufw:
+    rule: allow
+    port: "51820"
+    proto: udp
+ 
+- name: Enable UFW
+  ufw:
+    state: enabled
+ 
+- name: Disable SSH password authentication
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^#?PasswordAuthentication"
+    line: "PasswordAuthentication no"
+    state: present
+ 
+- name: Set SSH PermitRootLogin to prohibit-password
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^#?PermitRootLogin"
+    line: "PermitRootLogin prohibit-password"
+    state: present
+ 
+- name: Restart SSH service
+  service:
+    name: ssh
+    state: restarted
+ 
