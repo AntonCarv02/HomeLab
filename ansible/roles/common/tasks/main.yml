@@ -1,12 +1,12 @@
 ---
 - name: Update and upgrade apt packages
-  apt:
-    update_cache: yes
+  ansible.builtin.apt:
+    update_cache: true
     upgrade: dist
     cache_valid_time: 3600
- 
+
 - name: Install required base packages
-  apt:
+  ansible.builtin.apt:
     name:
       - curl
       - ca-certificates
@@ -14,67 +14,79 @@
       - ufw
       - fail2ban
     state: present
- 
+
 - name: Set UFW default inbound policy to deny
-  ufw:
+  community.general.ufw:
     direction: incoming
     policy: deny
- 
+
 - name: Set UFW default outbound policy to allow
-  ufw:
+  community.general.ufw:
     direction: outgoing
     policy: allow
- 
+
 - name: Allow SSH
-  ufw:
+  community.general.ufw:
     rule: allow
     port: "22"
     proto: tcp
- 
+
 - name: Allow HTTP
-  ufw:
+  community.general.ufw:
     rule: allow
     port: "80"
     proto: tcp
- 
+
 - name: Allow HTTPS
-  ufw:
+  community.general.ufw:
     rule: allow
     port: "443"
     proto: tcp
- 
+
 - name: Allow Kubernetes API
-  ufw:
+  community.general.ufw:
     rule: allow
     port: "6443"
     proto: tcp
- 
+
 - name: Allow WireGuard
-  ufw:
+  community.general.ufw:
     rule: allow
     port: "51820"
     proto: udp
- 
+
 - name: Enable UFW
-  ufw:
+  community.general.ufw:
     state: enabled
- 
+
 - name: Disable SSH password authentication
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/ssh/sshd_config
     regexp: "^#?PasswordAuthentication"
     line: "PasswordAuthentication no"
     state: present
- 
+
 - name: Set SSH PermitRootLogin to prohibit-password
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/ssh/sshd_config
     regexp: "^#?PermitRootLogin"
     line: "PermitRootLogin prohibit-password"
     state: present
- 
+
 - name: Restart SSH service
-  service:
+  ansible.builtin.service:
     name: ssh
     state: restarted
- 
+
+- name: Set DNS server
+  ansible.builtin.copy:
+    dest: /etc/resolv.conf
+    content: |
+      nameserver 8.8.8.8
+      nameserver 8.8.4.4
+    mode: "0644"
+
+- name: Protect resolv.conf from overwrite
+  ansible.builtin.command:
+    cmd: chattr +i /etc/resolv.conf
+  changed_when: false

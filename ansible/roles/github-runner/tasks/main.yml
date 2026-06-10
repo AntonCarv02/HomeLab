@@ -1,0 +1,58 @@
+- name: Create runner directory
+  ansible.builtin.file:
+    path: /opt/github-runner
+    state: directory
+    mode: "0755"
+
+- name: Download GitHub Actions runner
+  ansible.builtin.get_url:
+    url: https://github.com/actions/runner/releases/download/v2.334.0/actions-runner-linux-x64-2.334.0.tar.gz
+    dest: /opt/github-runner/actions-runner-linux-x64-2.334.0.tar.gz
+    mode: "0755"
+
+
+- name: Extract runner package
+  ansible.builtin.unarchive:
+    src: /opt/github-runner/actions-runner-linux-x64-2.334.0.tar.gz
+    dest: /opt/github-runner
+    remote_src: true
+
+- name: Create github-runner user
+  ansible.builtin.user:
+    name: github-runner
+    system: true
+    shell: /bin/bash
+    home: /opt/github-runner
+
+- name: Set ownership of runner directory
+  ansible.builtin.file:
+    path: /opt/github-runner
+    owner: github-runner
+    group: github-runner
+    recurse: true
+
+- name: Configure GitHub Actions runner
+  ansible.builtin.command:
+    cmd: >-
+      ./config.sh
+      --url https://github.com/{{ github_username }}/HomeLab
+      --token {{ github_runner_token }}
+      --unattended
+      --name homelab-runner
+      --labels homelab
+    chdir: /opt/github-runner
+    creates: /opt/github-runner/.runner
+  become_user: github-runner
+  become: true
+
+- name: Install runner service
+  ansible.builtin.command:
+    cmd: ./svc.sh install
+    chdir: /opt/github-runner
+    creates: /etc/systemd/system/actions.runner.AntonCarv02-HomeLab.homelab-runner.service
+
+- name: Start runner service
+  ansible.builtin.service:
+    name: actions.runner.AntonCarv02-HomeLab.homelab-runner
+    enabled: true
+    state: started

@@ -1,0 +1,13 @@
+---
+- name: Configure homelab LXC container
+  hosts: homelab
+  become: true
+  vars_files:
+    - vault.yml
+    - vars.yml
+  roles:
+    - common
+    - tailscale
+    - k3s
+    - duckdns
+    - github-runner

@@ -10,6 +10,7 @@
 *.retry
 group_vars/all/vault.yml
 host_vars/*/vault.yml
+vault.yml
 
 # SSH keys - never commit
 *.pem
