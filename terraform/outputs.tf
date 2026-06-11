@@ -1,4 +1,4 @@
-output "lxc_ip" {
-  description = "IP address of the homelab LXC container"
-  value       = proxmox_lxc.homelab.network[0].ip
+output "vm_ip" {
+  description = "IP address of the homelab VM"
+  value       = proxmox_vm_qemu.homelab.default_ipv4_address
 }

@@ -1,30 +1,36 @@
-resource "proxmox_lxc" "homelab" {
-  target_node     = "proxmox"
-  hostname        = "homelab"
-  ostemplate      = "local:vztmpl/ubuntu-24.04-standard_24.04-2_amd64.tar.zst"
-  password        = var.lxc_password
-  ssh_public_keys = var.ssh_public_key
-  unprivileged    = false
-  start           = true
-  onboot          = true
+resource "proxmox_vm_qemu" "homelab" {
+  target_node = "proxmox"
+  name        = "homelab"
+  vmid        = 100
+  clone       = var.vm_clone
+  start_at_node_boot      = true
+  os_type     = "cloud-init"
 
-  features {
-    nesting = true
-  }
+  cpu {
+  cores = 6
+}
+  memory  = 12288
 
-  rootfs {
-    storage = "local-lvm"
+  disk {
+    slot    = "scsi0"
     size    = "32G"
+    storage = "local-lvm"
+    type    = "disk"
   }
-
+  disk {
+  slot    = "ide2"
+  storage = "local-lvm"
+  type    = "cloudinit"
+}
   network {
-    name   = "eth0"
+    id     = 0
+    model  = "virtio"
     bridge = "vmbr0"
-    ip     = "192.168.1.225/24"
-    gw     = "192.168.1.1"
   }
 
-  cores  = 6
-  memory = 12288
-  swap   = 2048
+  ipconfig0  = "ip=192.168.1.225/24,gw=192.168.1.1"
+  sshkeys    = var.ssh_public_key
+  ciuser     = "ubuntu"
+  scsihw = "virtio-scsi-pci"
+  
 }

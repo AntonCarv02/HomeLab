@@ -17,18 +17,11 @@
     dest: /opt/github-runner
     remote_src: true
 
-- name: Create github-runner user
-  ansible.builtin.user:
-    name: github-runner
-    system: true
-    shell: /bin/bash
-    home: /opt/github-runner
-
 - name: Set ownership of runner directory
   ansible.builtin.file:
     path: /opt/github-runner
-    owner: github-runner
-    group: github-runner
+    owner: ubuntu
+    group: ubuntu
     recurse: true
 
 - name: Configure GitHub Actions runner
@@ -42,8 +35,7 @@
       --labels homelab
     chdir: /opt/github-runner
     creates: /opt/github-runner/.runner
-  become_user: github-runner
-  become: true
+  become: false
 
 - name: Install runner service
   ansible.builtin.command:

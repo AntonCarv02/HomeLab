@@ -14,13 +14,13 @@ variable "proxmox_password" {
   description = "Proxmox root password"
 }
 
-variable "lxc_password" {
-  type        = string
-  sensitive   = true
-  description = "Root password for the LXC container"
-}
-
 variable "ssh_public_key" {
   type        = string
   description = "SSH public key for LXC container access"
+}
+
+variable "vm_clone" {
+  type        = string
+  description = "Name of the Proxmox VM template to clone"
+  default     = "ubuntu-2404-cloudinit-template"
 }

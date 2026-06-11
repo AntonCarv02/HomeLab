@@ -86,7 +86,3 @@
       nameserver 8.8.4.4
     mode: "0644"
 
-- name: Protect resolv.conf from overwrite
-  ansible.builtin.command:
-    cmd: chattr +i /etc/resolv.conf
-  changed_when: false
