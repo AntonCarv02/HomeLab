@@ -12,7 +12,7 @@ err()  { printf '\033[1;31m[error]\033[0m %s\n' "$*" >&2; }
 # Skipped in CI — actions/checkout already has the verified commit.
 if [[ "${CI:-false}" != "true" ]]; then
   _repo_root="$(git -C "$(dirname "${BASH_SOURCE[0]}")" rev-parse --show-toplevel)"
-  log "Pulling latest ($CI not set — manual run)"
+  log "Pulling latest (CI not set — manual run)"
   git -C "$_repo_root" pull
   unset _repo_root
 fi

@@ -11,3 +11,12 @@
     - k3s
     - duckdns
     - github-runner
+
+- name: Configure Proxmox host
+  hosts: proxmox
+  become: true
+  vars_files:
+    - vault.yml
+    - vars.yml
+  roles:
+    - kubectl

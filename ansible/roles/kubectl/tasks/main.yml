@@ -1,0 +1,24 @@
+---
+- name: Download kubectl binary
+  ansible.builtin.get_url:
+    url: https://dl.k8s.io/release/v1.35.5/bin/linux/amd64/kubectl
+    dest: /usr/local/bin/kubectl
+    mode: "0755"
+
+- name: Fetch kubeconfig from VM
+  ansible.builtin.slurp:
+    src: /etc/rancher/k3s/k3s.yaml
+  delegate_to: 192.168.1.225
+  register: k3s_kubeconfig
+
+- name: Create .kube directory on Proxmox host
+  ansible.builtin.file:
+    path: /root/.kube
+    state: directory
+    mode: "0700"
+
+- name: Write kubeconfig to Proxmox host
+  ansible.builtin.copy:
+    content: "{{ k3s_kubeconfig.content | b64decode | replace('127.0.0.1', '192.168.1.225') }}"
+    dest: /root/.kube/config
+    mode: "0600"
