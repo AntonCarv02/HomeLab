@@ -27,3 +27,5 @@ homelab_key.pub
 # OS
 .DS_Store
 Thumbs.db
+
+.gitignore
